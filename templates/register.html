@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .fade-out {
+            animation: fadeOut 2s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Registrar</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="name">Nome:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Endereço de email</label>
+                <input type="text" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-group d-flex flex-column align-items-center">
+                <video id="video" width="320" height="240" autoplay></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <button type="button" class="btn btn-primary mt-2" onclick="captureImage()">Capturar Foto</button>
+                <input type="hidden" id="captured-image" name="photo">
+                <div id="capture-success" class="alert alert-success mt-2" style="display: none;">
+                    Imagem capturada com sucesso!
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Registrar</button>
+        </form>
+    </div>
+
+    <script>
+        var video = document.getElementById('video');
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var captureSuccessDiv = document.getElementById('capture-success');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function(error) {
+                console.error('Erro ao acessar a webcam:', error);
+            });
+
+        function captureImage() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var dataURL = canvas.toDataURL('image/jpeg');
+            document.getElementById('captured-image').value = dataURL;
+            captureSuccessDiv.style.display = 'block';
+            captureSuccessDiv.classList.remove('fade-out'); // Remove a classe, caso esteja aplicada
+            setTimeout(function() {
+                captureSuccessDiv.classList.add('fade-out'); // Adiciona a classe para iniciar o fade-out
+            }, 0); // Inicia imediatamente após a exibição
+            setTimeout(function() {
+                captureSuccessDiv.style.display = 'none'; // Esconde após a animação
+                captureSuccessDiv.classList.remove('fade-out'); // Remove a classe para o próximo uso
+            }, 2000); // Tempo total da animação
+        }
+    </script>
+</body>
+</html>
